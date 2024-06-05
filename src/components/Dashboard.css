@@ -1,0 +1,28 @@
+.dashboard {
+    padding: 20px;
+  }
+  
+  .dashboard h1 {
+    color: limegreen;
+    margin-bottom: 20px;
+  }
+  
+  .dashboard table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .dashboard table, .dashboard th, .dashboard td {
+    border: 1px solid #ddd;
+  }
+  
+  .dashboard th, .dashboard td {
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .dashboard th {
+    background-color: limegreen;
+    color: white;
+  }
+  
