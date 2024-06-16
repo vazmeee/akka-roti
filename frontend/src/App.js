@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/Header';
 import Hero from './components/Hero';
-import Profiles from './components/Profiles';
+// import Profiles from './components/Profiles';
 import Donations from './components/Donations';
 import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
@@ -10,7 +10,7 @@ import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
 import CallAPIView from './components/CallAPIView';
 import SuccessView from './components/SuccessView';
-import Home from './components/Home';
+// import Home from './components/Home';
 import VerifyEmail from './components/VerifyEmail';
 import Dashboard from './components/Dashboard';
 import Settings from './components/Settings';
@@ -19,7 +19,7 @@ import { SuperTokensWrapper } from 'supertokens-auth-react';
 import { getSuperTokensRoutesForReactRouterDom } from 'supertokens-auth-react/ui';
 import { PreBuiltUIList, ComponentWrapper, SuperTokensConfig } from './supertokensConfig';
 import SuperTokens from "supertokens-auth-react";
-import SessionCheck from './components/SessionCheck';
+// import SessionCheck from './components/SessionCheck';
 
 SuperTokens.init(SuperTokensConfig);
 
