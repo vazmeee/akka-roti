@@ -1,0 +1,98 @@
+/* Header.css */
+
+header {
+    background-color: #5dade2; /* Light blue */
+    padding: 10px 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    width: 100%;
+    top: 0;
+    z-index: 1000;
+}
+
+nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px; /* Limit the maximum width of the navbar */
+    margin: 0 auto; /* Center the navbar */
+    padding: 0 20px; /* Add padding to the sides */
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+nav a, nav button {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    margin: 0 1.5em; /* Increased spacing using relative units */
+    transition: transform 0.3s, color 0.3s;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    white-space: nowrap; /* Ensure text doesn't wrap */
+}
+
+nav a:hover, nav button:hover {
+    transform: scale(1.1);
+    /* color: #3498db; */
+}
+
+nav a::after, nav button::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: width 0.3s;
+}
+
+nav a:hover::after, nav button:hover::after {
+    width: 100%;
+}
+
+.logo {
+    height: 40px; /* Adjust the height of the logo as needed */
+    margin-right: 10px;
+    transition: transform 0.3s;
+}
+
+.logo:hover {
+    transform: scale(1.1);
+}
+
+.logo-name {
+    color: white;
+    font-size: 24px;
+    vertical-align: middle;
+    white-space: nowrap; /* Ensure text doesn't wrap */
+}
+
+.search-bar {
+    padding: 5px 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    font-size: 16px;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s; /* Added transform for scale animation */
+    width: 200px; /* Adjust width as needed */
+}
+
+.search-bar:hover {
+    transform: scale(1.1); /* Scale animation on hover */
+}
+
+.search-bar:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    outline: none;
+    transform: scale(1.1); /* Scale animation on focus */
+}

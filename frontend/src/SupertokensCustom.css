@@ -1,0 +1,16 @@
+/* SuperTokensCustom.css */
+
+/* Add fadeIn animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Apply the fadeIn animation to the SuperTokens container */
+.st-auth {
+    animation: fadeIn 1.5s ease-in-out;
+}

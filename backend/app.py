@@ -1,59 +1,152 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, abort, g
 from flask_cors import CORS
+from pymongo import MongoClient
+from config import Config
+from auth import init_supertokens, create_supertokens_middleware, is_authenticated, \
+    verify_session as supertokens_verify_session
+import uuid
+from supertokens_python import get_all_cors_headers
+from supertokens_python.framework.flask import Middleware
 
+init_supertokens()
 app = Flask(__name__)
-# CORS(app, resources={r"/api/*": {"origins": "http://localhost:3000"}})
-CORS(app)  # Apply CORS to all routes
+# create_supertokens_middleware(app)
+Middleware(app)
+app.config.from_object(Config)
 
-users = {}
+# Initialize SuperTokens
 
-@app.route('/', methods=['GET'])
-def _():
+# Create SuperTokens middleware
+
+
+
+CORS(
+    app=app,
+    origins=[
+        "http://localhost:3000",
+        "http://localhost:3000/",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3000/",
+        "http://0.0.0.0:3000",
+        "http://0.0.0.0:3000/",
+    ],
+    supports_credentials=True,
+    allow_headers=["Content-Type"] + get_all_cors_headers(),
+)
+
+
+# MongoDB setup
+client = MongoClient(app.config['MONGO_URI'])
+db = client.akkaaroti
+
+print(Config.SUPERTOKENS_API_DOMAIN, Config.SUPERTOKENS_CONNECTION_URI)
+
+
+# Health check endpoint
+@app.route('/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'UP', 'message': 'hello from akka roti'})
+
+
+@app.route("/sessioninfo", methods=["GET"])  # type: ignore
+@supertokens_verify_session()
+def get_session_info():
+    session_ = g.supertokens
+    return jsonify(
+        {
+            "sessionHandle": session_.get_handle(),
+            "userId": session_.get_user_id(),
+            "accessTokenPayload": session_.get_access_token_payload(),
+        }
+    )
+
+
+# # Signup endpoint
+# @app.route('/auth/signup', methods=['POST'])
+# def signup():
+#     # SuperTokens handles user signup
+#     return is_authenticated()
+#
+#
+# # Login endpoint
+# @app.route('/auth/login', methods=['POST'])
+# def login():
+#     # SuperTokens handles user login
+#     return is_authenticated()
+#
+
+
+@app.route('/profile', methods=['GET', 'POST', 'PUT'])
+@supertokens_verify_session()
+def profile_crud():
     if request.method == 'GET':
-        return jsonify({'status':'hello from akka roti'})
-    
+        user_id = request.args.get('user_id')
+        results = db.donations.find({"user_id": user_id})
+        # if
 
-@app.route('/api/signup', methods=['OPTIONS', 'POST'])
-def signup():
-    if request.method == 'OPTIONS':
-        return _build_cors_preflight_response()
+
+
+# Donate endpoint
+@app.route('/donate', methods=['POST'])
+@supertokens_verify_session()
+def donate():
     data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    
-    if email in users:
-        return jsonify({"success": False, "message": "User already exists"}), 400
-    
-    users[email] = password
-    return jsonify({"success": True, "message": "User created successfully"}), 201
+    user_id = request.args.get('user_id')
+    amount = data['amount']
+    message = data.get('message', '')
 
-@app.route('/api/login', methods=['OPTIONS', 'POST'])
-def login():
-    if request.method == 'OPTIONS':
-        return _build_cors_preflight_response()
-    data = request.get_json()
-    email = data.get('email')
-    password = data.get('password')
-    
-    if email not in users or users[email] != password:
-        return jsonify({"success": False, "message": "Invalid credentials"}), 400
-    
-    return jsonify({"success": True, "message": "Login successful"}), 200
+    donation_id = str(uuid.uuid4())
+    db.donations.insert_one({'_id': donation_id, 'user_id': user_id, 'amount': amount, 'message': message})
 
-def _build_cors_preflight_response():
-    response = jsonify({'status': 'success'})
-    response.headers.add("Access-Control-Allow-Origin", "*")
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type")
-    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
-    return response
+    return jsonify({'message': 'Donation successful!', 'donation_id': donation_id})
 
-@app.route('/api/test', methods=['GET', 'POST'])
-def test():
-    if request.method == 'POST':
-        data = request.get_json()
-        return jsonify({"message": "Data received", "data": data}), 200
-    return jsonify({"message": "GET request successful"}), 200
+
+# Fetch profile endpoint
+@app.route('/profile/<user_id>', methods=['GET'])
+# @supertokens_verify_session()
+def fetch_profile_donations(user_id):
+    # user = db.users.find_one({'_id': user_id})
+    # donations = db.donations.find({'user_id': user_id})
+    #
+    if user_id:
+    # if user:
+    #     user_data = {
+    #         'username': user['username'],
+    #         'donations': [{'amount': d['amount'], 'message': d['message']} for d in donations]
+    #     }
+    #     return jsonify(user_data)
+        donations_dummy = [
+            {
+                'name': 'Alice Johnson',
+                'count': 100,
+                'message': 'Keep up the great work!',
+            },
+            {
+                'name': 'Bob Brown',
+                'count': 50,
+                'message': 'Happy to support!'
+            },
+            {
+                'name': 'Charlie Davis',
+                'count': 75,
+                'message': 'Inspiring work!'
+            }
+        ]
+        return jsonify({'data': donations_dummy})
+    else:
+        return jsonify({'message': 'User not found!'}), 404
+
+
+# @app.route('/profile/<user_id>/donations', methods=['GET'])
+# def fetch_donations(user_id):
+
+
+
+@app.route('/', defaults={'u_path': ''})
+@app.route('/<path:u_path>')
+def catch_all(u_path: str):
+    abort(404)
 
 
 if __name__ == '__main__':
-    app.run(debug=True, port=8085)
+    app.run(debug=True, host='0.0.0.0', port=8081)

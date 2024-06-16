@@ -1,0 +1,14 @@
+/* Footer.css */
+
+footer {
+    background-color: #5dade2; /* Light blue */
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    position: relative;
+}
+
+footer p {
+    margin: 0;
+    animation: fadeIn 1.5s ease-in-out;
+}
